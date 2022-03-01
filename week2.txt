@@ -1,0 +1,41 @@
+Week- 2 & 3: B asic F ile C
+ommands: ls, c opy , get put etc . , & F 
+ile Management tasks in Hadoop
+a)Adding files and directories 
+b ) Retrieving files and 
+c ) D eleting files.
+
+
+T he following H DFS commands are used to access the H adoop File Sy stem (H DFS).
+1. version: T his command is used to access the version of H DFS.
+
+2. ls: This command is used to access the list of files and directories in H DFS.
+
+3. mkdir: T his command is used to the directory in file sy stem.
+The following command is used to check whether the directory is created or not.
+
+4 . copy From Local: This command is used to copy file from local file system (/ home/ cloudera) to H DFS. T o 
+demonstrate this command, a file by name file1 is created inlocal file sy stem (/ home/ 
+cloudera) using cat command and copied the same file1 to H DFS by using copy FromLocal command.
+
+5 . c opy T oL oc al: T his command is used to copy file from H DFS to local file sy stem
+(/ home/ cloudera). T o demonstrate this command, a file by name file1 is created in 
+H DFSiscopied to local file sy stem (/ home/ cloudera). Note: Delete file1 in local file sy
+stem(/ home/ cloudera).
+
+
+6 . put: T his command is used cop y files from local file sy stem to H DFS.
+N ote: T he command copy FromL ocal is similar to put command, except that the 
+source isrestricted to a local file reference.
+
+
+7 . get: T his command is used copy files from H DFS to local file sy stem.
+N ote: T he command copy T oL ocal is similar to get command, except that the 
+destination isrestricted to a local file reference.
+
+8. cat on HDFS: Retrieving files from HDFS
+
+9. rm on HDFS: Deleting file from HDFS
+
+10 . mv : T his command is used to move files across directories in H DFS
+11. c p: T his command is used to copy files across directories in H DFS
