@@ -1,0 +1,69 @@
+t=int(input())
+for i in range(t):
+    n=int(input())
+    l=list(map(int,input().split()))
+    a=l.sort()
+    l=l[::-1]
+    sl=[]
+    for j in a:
+        if a[j]>0 and a[j]<10:
+            sl.append(a[j])
+    sl=sl.sort()
+    sl=sl[::-1]
+    for k in range():
+        sl[k]>
+        
+        
+        
+        t=int(input())
+for i in range(t):
+    n=int(input())
+    l=list(map(int,input().split()))
+    l=l.sort()
+    #m=l[-1]
+    sl=[]
+    a=l[::-1]
+    print(a)
+    '''for j in range(n):
+        if a[j] in range(1,10):
+            sl.append(a[j])
+
+    sl=sl[::-1]
+    ans=[]
+    i=0
+    j=0
+    k=len(sl)
+    while k>0:
+        m=str(a[i])
+        if sl[i]>=m[0]:
+            ans.append(sl[i])
+            i+=1
+        else:
+            j+=1
+        k-=1
+    print(ans+a[j:]+sl[i:])'''
+
+
+
+
+
+class Solution:
+    def countPrimes(self, n: int) -> int:
+        c=0
+        ar=[0 for i in range(n+1)]
+        if n==1 or n==0:
+            return 0
+        else:
+            ar[0]=1
+            ar[1]=1
+            for i in range(2,int(sqrt(n))+1):
+                if ar[i]==0:
+                    j=i*i
+                    while j<=n:
+                        ar[j]=1
+                        j+=i
+            for i in range(n):
+                if ar[i]==0:
+                    c+=1
+            return c
+            
