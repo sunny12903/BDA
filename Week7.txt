@@ -1,0 +1,316 @@
+Week‐7 Pig commands – Pig Latin ‐ Relational Operators: Loading, Storing, 
+DiagnosticOperators (Dump, Describe,Illustrate & Explain)
+
+
+7a For the given Student dataset and Employee dataset, perform 
+Relational operations like Loading, Storing, Diagnostic Operations 
+(Dump, Describe, Illustrate & Explain) in Hadoop Pig framework using 
+Cloudera
+
+Student ID First Name Age City CGPA
+001 Jagruthi 21 Hyderabad 9.1
+002 Praneeth 22 Chennai 8.6
+003 Sujith 22 Mumbai 7.8
+004 Sreeja 21 Bengaluru 9.2
+005 Mahesh 24 Hyderabad 8.8
+006 Rohit 22 Chennai 7.8
+007 Sindhu 23 Mumbai 8.3
+
+Employee ID Name Age City
+001 Angelina 22 LosAngeles
+002 Jackie 23 Beijing
+003 Deepika 22 Mumbai
+004 Pawan 24 Hyderabad
+005 Rajani 21 Chennai
+006 Amitabh 22 Mumbai
+
+Step‐1: Create a Directory in HDFS with the name pigdir in the required path using mkdir:
+$ hdfs dfs ‐mkdir /bdalab/pigdir
+Step‐2: The inputfile of Pig contains each tuple/record in individual lines with the entities 
+separated by a delimiter ( “,”).
+
+In the local file system, create an input 
+file student_data.txt containing data as 
+shown below.
+001,Jagruthi,21,Hyderabad,9.1 
+002,Praneeth,22,Chennai,8.6 
+003,Sujith,22,Mumbai,7.8 
+004,Sreeja,21,Bengaluru,9.2 
+005,Mahesh,24,Hyderabad,8.8 
+006,Rohit,22,Chennai,7.8 
+007,Sindhu,23,Mumbai,8.3
+
+
+
+In the localfile system, create an input 
+file employee_data.txt containing data 
+as shown below.
+001,Angelina,22,LosAngeles 
+002,Jackie,23,Beijing 
+003,Deepika,22,Mumbai 
+004,Pawan,24,Hyderabad 
+005,Rajani,21,Chennai 
+006,Amitabh,22,Mumbai
+
+Step‐3: Move the file from the local file system to HDFS using put (Or) copyFromLocal
+command and verify using ‐cat command
+$ hdfs dfs ‐put /home/cloudera/pigdir/student_data /bdalab/pigdir/
+$ hdfs dfs ‐cat / bdalab/pigdir/student_data
+Student ID First Name Age City CGPA
+001 Jagruthi 21 Hyderabad 9.1
+002 Praneeth 22 Chennai 8.6
+003 Sujith 22 Mumbai 7.8
+004 Sreeja 21 Bengaluru 9.2
+005 Mahesh 24 Hyderabad 8.8
+006 Rohit 22 Chennai 7.8
+007 Sindhu 23 Mumbai 8.3
+
+
+Step‐3: Move the file from the local file system to HDFS using put (Or) copyFromLocal
+command and verify using ‐cat command
+$ hdfs dfs ‐put /home/cloudera/pigdir/employee_data /bdalab/pigdir/
+$ hdfs dfs ‐cat /bdalab/pigdir/employee_data
+
+Step‐4: Apply Relational Operator – LOAD to load the data from the file student_data.txt 
+intoPig byexecuting thefollowing Pig Latin statementin theGruntshell.Relational 
+Operators are NOT case sensitive.
+$ pig => will direct to grunt> shell
+grunt> student=LOAD'/bdalab/pigdir/student_data.txt' USING PigStorage(',') as 
+(id:int, name:chararray, age:int, city:chararray, cgpa:double );
+grunt> employee = LOAD'/bdalab/pigdir/employee_data.txt’USINGPigStorage(',') 
+as ( id:int, name:chararray, age:int, city:chararray);
+
+Step‐5: Apply Relational Operator – STORE to Store the relation in the HDFS directory
+“/pig_output/” as shown below.
+grunt>STOREstudentINTO'/bdalab/pigdir/pig_output/'USINGPigStorage(','); 
+grunt> STORE employee INTO ' /bdalab/pigdir/pig_output/ ' USING PigStorage (',');
+
+Step‐6: Verify the stored data as shown below
+$ hdfs dfs ‐ls /bdalab/pigdir/pig_output/
+$ hdfs dfs ‐cat /bdalab/pigdir/pig_output/part‐m‐00000
+
+Step‐7: Apply Relational Operator –Diagnostic Operator – DUMP to Printthecontents of 
+the relation.
+grunt> Dump student
+grunt> Dump employee
+
+Step‐8: ApplyRelationalOperator–DiagnosticOperator–DESCIBEtoViewtheschemaofa 
+relation.
+grunt> Describe student 
+grunt> Describe employee
+
+Step‐9: ApplyRelationalOperator –Diagnostic Operator –EXPLAINtoDisplaythelogical, 
+physical,andMapReduceexecution plansof arelation usingExplainoperator
+grunt> Explain student 
+grunt> Explain employee
+
+Step‐9: ApplyRelationalOperator –DiagnosticOperator –ILLUSTRATEtogivethestep‐by‐
+step execution of a sequence of statements
+grunt> Illustrate student 
+grunt> Illustrate employee
+
+
+
+7b For the given Student dataset and Employee dataset, perform 
+Relational operator – GROUP operations in Hadoop Pig framework 
+using Cloudera
+The GROUP operator is used to group the data in one or more relations. It collects the data 
+having the same key.
+grunt> Group_data = GROUP Relation_name BY Key;
+Step‐1: Grouptherecords/tuples intherelation byageusingGROUPcommandandverify. 
+grunt> group_std = GROUP student BY age;
+grunt> Dump group_std;
+grunt> group_emp = GROUP employee BY city; 
+grunt> Dump group_emp;
+Step‐2: View Schema ofthe table after grouping the data using the describe command as 
+shown below.
+grunt> Describe group_std;
+group_std: {group: int,student: {(id:int, name:chararray, age:int, city:chararray, 
+cgpa:float)}}
+grunt> Describe group_emp;
+group_emp: {group: int,employee: {(id: int,name: chararray,age:int,city: chararray)}}
+Step‐3: Groupbymultiplecolumns oftherelationbyage andcityandverifythecontent. 
+grunt> groupmultiple_std = GROUP student BY (age, city);
+grunt> Dump groupmultiple_std
+grunt> groupmultiple_emp = GROUP employee BY (age, city); 
+grunt> Dump groupmultiple_emp
+Step‐4: GroupbyAllcolumnsoftherelationandverifythecontent. 
+grunt> groupall_std = GROUP student All;
+grunt> Dump groupall_std
+grunt> groupall_emp = GROUP employee All; 
+grunt> Dump groupall_emp
+Step‐5: Combinedly Group the records/tuples of the relations student_data and 
+employee_data with the key age and then verify the result.
+grunt>cogroup_stdemp =COGROUP student_data byage, employee_data by age; 
+grunt> Dumpcogroup_stdemp
+
+
+
+Week‐7 Pig commands – Pig Latin ‐ Relational Operator: Join
+7c Forthe given Student data and Student attendance datasets, perform 
+Relational operations like JOIN(Self‐join, Inner‐join, Outer‐join: Left 
+join,Rightjoin,andFulljoin)inHadoopPigframework usingCloudera.
+
+Student_data
+Student ID Name Age City CGPA
+1 Jagruthi 21 Hyderabad 9.1
+2 Praneeth 22 Chennai 8.6
+3 Sujith 22 Mumbai 7.8
+4 Sreeja 21 Bengaluru 9.2
+5 Mahesh 24 Hyderabad 8.8
+6 Rohit 22 Chennai 7.8
+7 Sindhu 23 Mumbai 8.3
+
+Student_att
+Student ID Name Action Time
+1 Jagruthi Joined 9:10:10
+4 Sreeja Joined 9:10:24
+6 Rohit Joined 9:11:15
+7 Sindhu Joined 9:12:25
+8 Sai Joined 9:14:18
+9 Meghana Joined 9:15:2
+
+Step‐1: Create a Directory in HDFS with the name pigdir in the required path using mkdir:
+$ hdfs dfs ‐mkdir /bdalab/pigdir
+Step‐2: The inputfile of Pig contains each tuple/record in individual lines with the entities 
+separated by a delimiter ( “,”).
+
+In the local file system, create an input 
+file student_data.txt containing data as 
+shown below.
+1,Jagruthi,21,Hyderabad,9.1 
+2,Praneeth,22,Chennai,8.6 
+3,Sujith,22,Mumbai,7.8 
+4,Sreeja,21,Bengaluru,9.2 
+5,Mahesh,24,Hyderabad,8.8 
+6,Rohit,22,Chennai,7.8 
+7,Sindhu,23,Mumbai,8.3
+
+In the local file system, create an input 
+file student_att.txt containing data as 
+shown below.
+1,Jagruthi,joined,9:10:10 
+4,Sreeja,joined,9:10:24 
+6,Rohit,joined,9:11:15 
+7,Sindhu,joined,9:12:25 
+8,Sai,joined,9:14:18 
+9,Meghana,joined,9:15:25
+
+Step‐3: Move the file from the local file system to HDFS using put (Or) copyFromLocal
+command and verify using ‐cat command
+$ hdfs dfs ‐put /home/cloudera/pigdir/student_data /bdalab/pigdir/
+$ hdfs dfs ‐cat / bdalab/pigdir/student_data
+$ hdfs dfs ‐put /home/cloudera/pigdir/student_att /bdalab/pigdir/
+$ hdfs dfs ‐cat /bdalab/pigdir/student_att
+
+
+Step‐4: Open Pig in Grunt shell and execute the following Pig Latin statement.
+Apply Relational Operator – LOAD to load the data into Relation name std_data
+from the file student_data.txt into Relational Operators are NOT case sensitive.
+$ pig =>will directto grunt>
+grunt>std_data =LOAD'/bdalab/pigdir/student_data' USINGPigStorage(',')as 
+(id:int, name:chararray, age:int, city:chararray, cgpa:double );
+grunt> DUMP std_data;
+(1,Jagruthi,21,Hyderabad,9.1) 
+(2,Praneeth,22,Chennai,8.6) 
+(3,Sujith,22,Mumbai,7.8) 
+(4,Sreeja,21,Bengaluru,9.2) 
+(5,Mahesh,24,Hyderabad,8.8) 
+(6,Rohit,22,Chennai,7.8) 
+(7,Sindhu,23,Mumbai,8.3)
+grunt> std_att = LOAD ' /bdalab/pigdir/student_att’ USING PigStorage(',') as (id:int, 
+name:chararray, action:chararray, time:chararray);
+grunt> DUMP std_att;
+(1,Jagruthi,joined,9:10:10) 
+(4,Sreeja,joined,9:10:24) 
+(6,Rohit,joined,9:11:15) 
+(7,Sindhu,joined,9:12:25) 
+(8,Sai,joined,9.14:18) 
+(9,Meghana,joined,9.15:25)
+The JOINoperatorisused tocombine recordsfromtwo or more relations.While performinga 
+joinoperation,wedeclareone(oragroupof)tuple(s)fromeachrelation,askeys.Whenthese 
+keys match, the two tuples are matched, else the records are dropped. Joins can be of the 
+following types −
+• SELF‐Join
+• INNER‐Join
+• OUTER‐Join − LEFT Join, RIGHT Join, and FULL Join
+
+
+Step‐5: SELF‐JOIN, we willload the same data multiple times, under different aliases (names). 
+grunt> std1 = LOAD ' /bdalab/pigdir/student_data ' USING PigStorage(',') as (id:int, 
+name:chararray, age:int, city:chararray, cgpa:float);
+grunt> std2 = LOAD ' /bdalab/pigdir/student_data 'USING PigStorage(',') as (id:int, 
+name:chararray, age:int, city:chararray, cgpa:float );
+grunt>selfjoin_std_data =JOINstudents1 BYid, students2BYid; 
+grunt> dump selfjoin_std_data; 
+(1,Jagruthi,21,Hyderabad,9.1,1,Jagruthi,21,Hyderabad,9.1)
+
+(2,Praneeth,22,Chennai,8.6,2,Praneeth,22,Chennai,8.6) 
+(3,Sujith,22,Mumbai,7.8,3,Sujith,22,Mumbai,7.8) 
+(4,Sreeja,21,Bengaluru,9.2,4,Sreeja,21,Bengaluru,9.2) 
+(5,Mahesh,24,Hyderabad,8.8,5,Mahesh,24,Hyderabad,8.8) 
+(6,Rohit,22,Chennai,7.8,6,Rohit,22,Chennai,7.8) 
+(7,Sindhu,23,Mumbai,8.3,7,Sindhu,23,Mumbai,8.3)
+
+Step‐6: INNER JOIN ‐ EQUI JOIN creates a new relation by combining column values of two 
+relations based upon the join‐predicate. It returns rows when there is a match in 
+both tables.
+grunt> innerjoin_data_att = JOIN std_data BY id, std_att BY id;
+grunt> dump std_data_att;
+(1,Jagruthi,21,Hyderabad,9.1,1,Jagruthi,joined,9:10:10) 
+(4,Sreeja,21,Bengaluru,9.2,4,Sreeja,joined,9:10:24) 
+(6,Rohit,22,Chennai,7.8,6,Rohit,joined,9:11:15) 
+(7,Sindhu,23,Mumbai,8.3,7,Sindhu,joined,9:12:25)
+OUTERJOINreturnsallthe rows fromatleast one ofthe relations.An outerjoin operation is 
+carried out in three ways −
+• LEFT OUTERJOIN
+• RIGHT OUTERJOIN
+• FULL OUTERJOIN
+
+Step‐7: LEFTOUTERJOINoperation returnsallrows fromthe lefttable,evenifthere areno 
+matches in the rightrelation.
+Note: Student_data is LEFT
+grunt>outerleft_data_att=JOINstd_dataBYidLEFT,std_attBYid; 
+grunt> DUMP outerleft_data_att
+(1,Jagruthi,21,Hyderabad,9.1,1,Jagruthi,joined,9:10:10) 
+(2,Praneeth,22,Chennai,8.6,,,,)
+(3,Sujith,22,Mumbai,7.8,,,,) 
+(4,Sreeja,21,Bengaluru,9.2,4,Sreeja,joined,9:10:24) 
+(5,Mahesh,24,Hyderabad,8.8,,,,) 
+(6,Rohit,22,Chennai,7.8,6,Rohit,joined,9:11:15) 
+(7,Sindhu,23,Mumbai,8.3,7,Sindhu,joined,9:12:25)
+Note: Student_att is LEFT
+grunt> outerleft_att_data = JOIN std_att BY id LEFT, std_data BY id; 
+grunt> DUMP outerleft_att_data;
+(1,Jagruthi,joined,9:10:10,1,Jagruthi,21,Hyderabad,9.1) 
+(4,Sreeja,joined,9:10:24,4,Sreeja,21,Bengaluru,9.2) 
+(6,Rohit,joined,9:11:15,6,Rohit,22,Chennai,7.8) 
+(7,Sindhu,joined,9:12:25,7,Sindhu,23,Mumbai,8.3)
+
+(8,Sai,joined,9.14:18,,,,,)
+(9,Meghana,joined,9.15:25,,,,,)
+
+Step‐8: RIGHTOUTERJOINoperation returnsallrows fromthe righttable,even ifthere are 
+no matches in the left table.
+grunt>outerright_data_att=JOINstd_dataBYidRIGHT, std_attBYid; 
+grunt> DUMP outerright_data_att;
+(1,Jagruthi,21,Hyderabad,9.1,1,Jagruthi,joined,9:10:10) 
+(4,Sreeja,21,Bengaluru,9.2,4,Sreeja,joined,9:10:24) 
+(6,Rohit,22,Chennai,7.8,6,Rohit,joined,9:11:15) 
+(7,Sindhu,23,Mumbai,8.3,7,Sindhu,joined,9:12:25) 
+(,,,,,8,Sai,joined,9.14:18)
+(,,,,,9,Meghana,joined,9.15:25)
+
+Step‐9: FULL OUTER JOIN operation returns rows when there is a match in one of the 
+relations.
+grunt>outerfull_data_att =JOINstd_dataBYidFULL, std_attBYid; 
+grunt> DUMP outerfull_data_att;
+(1,Jagruthi,21,Hyderabad,9.1,1,Jagruthi,joined,9:10:10) 
+(2,Praneeth,22,Chennai,8.6,,,,)
+(3,Sujith,22,Mumbai,7.8,,,,) 
+(4,Sreeja,21,Bengaluru,9.2,4,Sreeja,joined,9:10:24) 
+(5,Mahesh,24,Hyderabad,8.8,,,,) 
+(6,Rohit,22,Chennai,7.8,6,Rohit,joined,9:11:15) 
+(7,Sindhu,23,Mumbai,8.3,7,Sindhu,joined,9:12:25) 
+(,,,,,8,Sai,joined,9.14:18)
+(,,,,,9,Meghana,joined,9.15:25)

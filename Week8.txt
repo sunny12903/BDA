@@ -1,0 +1,232 @@
+Week‐8 Hive Data Definition Language (DDL) Commands
+8a Implement Data Definition Language (DDL) Commands for databases 
+in Hadoop Hive framework using Cloudera.
+
+➢ Open Virtual box and then start cloudera quickstartTerminal andtype“hive” tolaunch 
+hive shell
+
+DDL Commands forDatabases
+1) CREATEdatabase StatementisusedtocreateadatabaseinHive.AdatabaseinHiveisa 
+namespace or a collection or catalog of tables.
+Syntax: CREATE DATABASE|SCHEMA [IF NOT EXISTS] database_name 
+[COMMENT database_comment]
+[LOCATION hdfs_path]
+[WITH DBPROPERTIES (property_name=property_value, ...)];
+[ ] are optional clauses. We can use SCHEMA in place of DATABASE in this command. The 
+following query is executed to create a database named employee. If everything went 
+good, you will see a ‘OK’ message, else you will see relevant error message.
+Simple creation
+hive> CREATE DATABASE facultycse; 
+OK
+Time taken: 0.033 seconds
+hive> CREATE DATABASEfacultyece;
+Full creation
+hive> CREATE DATABASE IF NOT EXISTS employee COMMENT ‘this is employee database’ 
+LOCATION ‘/user/hive/warehouse/hivedir/’ WITH DBPROPERTIES (‘creator’=‘Bhanu’, 
+‘date’=‘2020‐12‐07’);
+
+2) SHOWdatabases statementlists allthe databases presentinthe metastore. 
+Syn: SHOW (DATABASES/SCHEMAS) [LIKE ‘wildcards'];
+➢ Wildcards in the regular expression can only be '*' for any character(s) or '|' for a 
+choice. Examples are 'employees', 'emp*', 'emp*|*ees', all of which will match the 
+database named 'employees’:
+hive> SHOW DATABASES; hive> SHOW DATABASES LIKE ‘*ee’;
+default employee
+employee
+facultycse hive> SHOW DATABASES LIKE ‘fac*’;
+facultyece facultycse 
+facultyece
+
+3) DESCRIBEdatabase statementinHiveshowsthename ofDatabaseinHive,itscomment(if 
+set), its location, its owner name, owner type and its properties.
+Syn: DESCRIBE DATABASE/SCHEMA [EXTENDED] db_name;
+➢ EXTENDED can be used to getthe database properties.
+Big Data Analytics Lab Manual
+2
+hive>DESCRIBE DATABASE facultycse;
+facultycse hdfs://quickstart.cloudera:8020/user/hive/warehouse/faculty.db cloudera USER
+hive>DESCRIBE DATABASE EXTENDED employee;
+employee this is employee database 
+hdfs://quickstart.cloudera:8020/user/hive/warehouse/ cloudera USER {date=2020‐12‐07, 
+creator=Bhanu};
+
+4) USE database statement in Hive is used to select the specific database for a session on 
+which all subsequent HiveQL statements would be executed.
+Syn: USE db_name; 
+hive> USE employee; 
+OK
+
+5) DROP database statement in Hive is used to Drop (delete) the database. The default 
+behaviorisRESTRICTwhich means thatthe database isdropped onlywhen itis empty. To 
+drop the database with tables, we can use CASCADE.
+Syn: DROP (DATABASE|SCHEMA) [IF EXISTS] db_name [RESTRICT|CASCADE];
+hive> DROP DATABASE facultyece; 
+OK
+hive>DROPDATABASE IFEXISTS facultycseCASCADE; 
+OK
+
+6) ALTER database statement in Hive is used to change the metadata associated with the 
+database in Hive.
+Syntax for changing Database Properties:
+ALTER (DATABASE|SCHEMA) db_name SET DBPROPERTIES
+(property_name=property_value, ...);
+hive> ALTER DATABASE employee SET DBPROPERTIES (‘creator’=‘Bhanu Prasad’,
+‘date’=‘07‐12‐2020’);
+employee this is employee database hdfs://quickstart.cloudera:8020
+/user/hive/warehouse/hivedir/ cloudera USER {date= 07‐12‐2020, creator=Bhanu Prasad};
+
+Syn for changing Database owner:
+ALTER(DATABASE|SCHEMA) database_name SETOWNER[USER|ROLE] user_or_role;
+hive> ALTER DATABASE employee SET OWNER USER client;
+employee this is employee database hdfs://quickstart.cloudera:8020
+/user/hive/warehouse/hivedir/ client USER {date= 07‐12‐2020, creator=Bhanu Prasad}; 
+hive> ALTER DATABASE employee SET OWNER ROLE Admin;
+employee this is employee database hdfs://quickstart.cloudera:8020
+/user/hive/warehouse/hivedir/ Admin ROLE {date= 07‐12‐2020, creator=Bhanu Prasad};
+
+
+
+7b Implement Data Definition Language (DDL) Commands fortables in 
+Hadoop Hive framework using Cloudera.
+
+DDL Commands forTables
+1) CREATETABLE statementinHiveisusedtocreateatablewiththegivenname.Ifatable or 
+view already exists with the same name, then the error is thrown. We can use IF NOT 
+EXISTS to skip the error.
+Syn:CREATETABLE[IFNOTEXISTS] [db_name.]table_name [(col_name data_type 
+[COMMENTcol_comment],... [COMMENT col_comment])]
+[COMMENT table_comment] 
+[ROW FORMAT row_format] 
+[STORED AS file_format] 
+[LOCATION hdfs_path];
+hive> CREATE TABLE IF NOT EXISTS employee.emptable (emp_id STRING COMMENT 
+‘This is Employee ID’, emp_name STRING COMMENT ‘This is Employee Name’, emp_sal 
+FLOAT COMMENT ‘This is Employee Salary’)
+COMMENT ‘This table contains Employees Data’ 
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ‘,’
+STORED AS TEXTFILE;
+
+2) SHOWtables statementinHive lists allthe base tables and views in the current database. 
+Syn: SHOW TABLES [IN database_name];
+hive>SHOWTABLESINemployee; 
+OK
+emptable
+
+3) DESCRIBE table statement in Hive shows the lists of columns for the specified table. 
+Syn: DESCRIBE [EXTENDED|FORMATTED] [db_name.] table_name[.col_name ( 
+[.field_name])];
+hive> DESCRIBE employee.emptable; 
+emp_id string This is Employee ID 
+emp_name string This is Employee Name 
+emp_sal float This is Employee Salary
+hive> DESCRIBE EXTENDED employee.emptable; 
+hive> DESCRIBE FORMATTED employee.emptable;
+
+4) ALTER table statementin Hive enables you to change the structure of an existing table, 
+rename the table, add columns to the table, change the table properties, etc.
+Syntax for Rename a table:
+
+ALTER TABLE table_name RENAME TO new_table_name;
+hive> ALTER TABLE employee.emptable RENAME TO employee.facultytable;
+Syn to Add columns to a table:
+ALTER TABLE table_name ADD COLUMNS (column1, column2) ;
+hive> ALTER TABLE employee.facultytable ADD COLUMNS (emp_post string COMMENT
+‘This is employee post’, emp_age INT COMMENT ‘This is employee age’);
+Syn to set table properties:
+ALTER TABLE table_name SET TBLPROPERTIES (‘property_key’=’property_new_value’);
+hive> ALTER TABLE employee.facultytable SET TBLPROPERTIES (‘table for’=’faculty data’);
+
+5) DROP table statement in Hive deletes the data for a particular table and remove all 
+metadata associated with it from Hive metastore.
+➢ If PURGE is not specified, then the data is actually moved to the .Trash/current 
+directory.
+➢ IfPURGEisspecified,thendataislostcompletely. 
+Syn:DROPTABLE[IFEXISTS] table_name[PURGE];
+hive> DROP TABLE IF EXISTS employee.emptable PURGE; 
+OK
+
+6) TRUNCATEtable statementinHiveremoves alltherows fromthetableorpartition. 
+Syn: TRUNCATE TABLE table_name;
+hive> TRUNCATE TABLE employee.emptable; 
+OK
+
+
+
+
+Week‐8 Hive Data Manipulation Language (DML) Commands
+8 ImplementDataManipulationLanguage (DML)Commands fortables 
+in Hadoop Hive framework using Cloudera.
+➢ Open Virtual box and then start cloudera quickstart Terminal and type “hive” to launch 
+hive shell
+DML Commands for Tables
+1) LOADstatementinHiveisusedtocopy/movedatafilesintothe locationscorresponding to 
+Hive tables.
+Syn: LOAD DATA [LOCAL] INPATH 'filepath' [OVERWRITE] INTO TABLE tablename
+[PARTITION (partcol1=val1, partcol2=val2 ...)]; 
+LOCAL keyword=filepathinthelocalfilesystem. 
+LOCAL not specified =file path in the hdfs
+OVERWRITE contents ofthe targettable(or partition)will bedeletedandreplaced bythe 
+files otherwise contents are added to the table
+hive> LOAD DATA LOCAL INPATH ‘/home/cloudera/HiveDir/emptextdata' INTO TABLE 
+employee.facultytable;
+OK
+emptextdata contents
+1,bob,25000.00,asstprof,35,male 
+2,mary,35000.00,assocprof,38,female 
+3,mike,50000.00,prof,45,male
+2) SELECTstatementinHiveis similartothe SELECTstatementinSQLusedforretrievingdata 
+from the database.
+Syn: SELECT * FROM tablename; //displays all records 
+hive> SELECT * FROM employee.facultytable;
+1 bob 25000.00 asstprof 35 male
+2 mary 35000.00 assocprof 38 female
+3 mike 50000.00 prof 45 male
+SELECT col1,col2 FROM tablename; //Retrieves only specified columns data 
+hive> SELECT emp_name,emp_salary FROM employee.facultytable;
+bob 25000.00
+mary 35000.00
+mike 50000.00
+3) a) INSERT INTOstatement appends the data into existing data in the table or partition.
+Syn: INSERT INTO TABLE tablename [PARTITION (partcol1=val1, partcol2=val2 ...)] 
+VALUES (col1value,col2value,…)
+hive> INSERT INTO TABLE employee.facultytable VALUES (4, ‘jessy’, 45000.00, ‘assocprof’, 
+40, ‘female’);
+Big Data Analytics Lab Manual
+2
+hive> SELECT * FROM employee.facultytable;
+4 jessy 45000.00 assocprof 40 female
+1 bob 25000.00 asstprof 35 male
+2 mary 35000.00 assocprof 38 female
+3 mike 50000.00 prof 45 male
+b) INSERT OVERWRITE table overwrites the existing data in the table or partition. 
+Syn: INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, ..) [IF NOT 
+EXISTS]] select_statement FROM from_statement;
+4) DELETE statementinHive deletes the table data.IftheWHEREclause is specified,thenit 
+deletes the rows that satisfy the condition in where clause.
+Syn: DELETE FROM tablename [WHERE expression];
+hive> DELETE FROM employee.facultytable WHERE emp_age=38; 
+hive> SELECT * FROM employee.facultytable;
+4 jessy 45000.00 assocprof 40 female
+1 bob 25000.00 asstprof 35 male
+3 mike 50000.00 prof 45 male
+5) UPDATE statementinHive deletes the table data.Ifthe WHERE clause is specified,then it 
+updates the column of the rows that satisfy the condition in WHERE clause. Partitioning 
+and Bucketing columns cannot be updated.
+Syn: UPDATE tablename SET column = value [, column = value ...] [WHERE expression]; 
+hive> UPDATE employee.facultytable SET emp_name = ‘mike tyson’ WHERE emp_age=45; 
+hive> SELECT * FROM employee.facultytable;
+4 jessy 45000.00 assocprof 40 female
+1 bob 25000.00 asstprof 35 male
+3 mike tyson 50000.00 prof 45 male
+6) EXPORT statement exports the table or partition data along with the metadata to the 
+specified output location in the HDFS. Metadata is exported in a _metadata file, and data is 
+exported in a subdirectory ‘data.’
+Syn: EXPORT TABLE tablename [PARTITION (part_column="value"[, ...])] TO 
+'export_target_path' [ FOR replication('eventid') ];
+hive> EXPORT TABLE employee.drivertable TO ‘/user/hive/warehouse’;
+7) IMPORT command imports the data from a specified location to a new table or already 
+existing table.
+Syn: IMPORT [[EXTERNAL] TABLE new_or_original_tablename [PARTITION 
+(part_column="value"[, ...])]] FROM 'source_path' [LOCATION 'import_target_path’];
+hive> IMPORT TABLE employee.importedtable FROM ‘/user/hive/warehouse’;

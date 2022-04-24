@@ -1,0 +1,132 @@
+Week‐1 
+0
+Pig commands – Pig Latin ‐ Relational Operator: FILTER, SPLIT,
+WORDCOUNT program
+10a For the given Student dataset and Student attendance dataset, 
+perform Relational operator – FILTER and SPLIT operations in Hadoop 
+Pig framework usingCloudera
+Student_data
+Student ID Name Age City CGPA
+1 Jagruthi 21 Hyderabad 9.1
+2 Praneeth 22 Chennai 8.6
+3 Sujith 22 Mumbai 7.8
+4 Sreeja 21 Bengaluru 9.2
+5 Mahesh 24 Hyderabad 8.8
+6 Rohit 22 Chennai 7.8
+7 Sindhu 23 Mumbai 8.3
+
+Step‐1: Create a Directory in HDFS with the name pigdir in the required path using mkdir:
+$ hdfs dfs ‐mkdir /bdalab/pigdir
+Step‐2: The inputfile of Pig contains each tuple/record in individual lines with the entities 
+separated by a delimiter ( “,”).
+In the local file system, create an input file student_data.txt containing data as 
+shown below.
+1,Jagruthi,21,Hyderabad,9.1 
+2,Praneeth,22,Chennai,8.6 
+3,Sujith,22,Mumbai,7.8 
+4,Sreeja,21,Bengaluru,9.2 
+5,Mahesh,24,Hyderabad,8.8 
+6,Rohit,22,Chennai,7.8 
+7,Sindhu,23,Mumbai,8.3
+Step‐3: Move the file from the local file system to HDFS using put (Or) copyFromLocal
+command and verify using ‐cat command
+$ hdfs dfs ‐put /home/cloudera/pigdir/student_data /bdalab/pigdir/
+$ hdfs dfs ‐cat / bdalab/pigdir/student_data
+Step‐4: Open Pig in Grunt shell and execute the following Pig Latin statement.
+Apply Relational Operator – LOAD to load the data into Relation name std_data
+from the file student_data.txt into Relational Operators are NOT case sensitive.
+$ pig =>will directto grunt>
+grunt>std_data=LOAD'/bdalab/pigdir/student_data' USINGPigStorage(',')as 
+(id:int, name:chararray, age:int, city:chararray, cgpa:double );
+grunt> DUMP std_data; 
+(1,Jagruthi,21,Hyderabad,9.1)
+Big Data Analytics Lab Manual
+2
+(2,Praneeth,22,Chennai,8.6) 
+(3,Sujith,22,Mumbai,7.8) 
+(4,Sreeja,21,Bengaluru,9.2) 
+(5,Mahesh,24,Hyderabad,8.8) 
+(6,Rohit,22,Chennai,7.8) 
+(7,Sindhu,23,Mumbai,8.3)
+Step‐5: FILTER operator is used to select the required tuples from a relation based on a 
+condition
+grunt>filter_std=FILTERstd_data BYcity=='Hyderabad'; 
+grunt> DUMP filter_std;
+(1,Jagruthi,21,Hyderabad,9.1) 
+(5,Mahesh,24,Hyderabad,8.8)
+Step‐6: SPLIT operator is used to split a relation into two or more relations
+grunt>SPLITstd_data INTOsplit_std1IFage<23, split_std2IF(age>22 ANDage<25); 
+grunt> DUMP split_std1;
+(1,Jagruthi,21,Hyderabad,9.1) 
+(2,Praneeth,22,Chennai,8.6) 
+(3,Sujith,22,Mumbai,7.8) 
+(4,Sreeja,21,Bengaluru,9.2) 
+(6,Rohit,22,Chennai,7.8)
+grunt> DUMP split_std2;
+(5,Mahesh,24,Hyderabad,8.8) 
+(7,Sindhu,23,Mumbai,8.3)
+
+
+10b Develop aWordCount programusing Pig Latin statements inHadoop 
+Pig framework usingCloudera
+Theinputfile ofPig containseachtuple/recordinindividuallineswith theentitiesseparated 
+by a delimiter ( “,”).
+Step‐1: Create a Directory in HDFS with the name pigdir in the required path using mkdir:
+$ hdfs dfs ‐mkdir /bdalab/pigdir
+Step‐2: In the local file system, create an input file wordcount containing data as shown 
+below.
+Deer,Bear,River 
+Car,Car,River 
+River,Car,River 
+Deer,River,Bear
+Step‐3: Move the file from the local file system to HDFS using put (Or) copyFromLocal
+command and verify using ‐cat command
+$ hdfs dfs ‐put /home/cloudera/pigdir/wordcount_data /bdalab/pigdir/
+$ hdfs dfs ‐cat / bdalab/pigdir/ wordcount_data
+Step‐4: Open Pig in Grunt shell and execute the following Pig Latin statement.
+$ pig =>will directto grunt> 
+Convert Each line to each tuple.
+Apply Relational Operator – LOAD to load the data into Relation lines from the file
+wordcount_data.
+grunt> lines = LOAD '/bdalab/pigdir/wordcount_data' AS (line:chararray);
+grunt> DUMP lines;
+(Deer,Bear,River) 
+(Car,Car,River) 
+(River,Car,River) 
+(Deer,River,Bear)
+Step‐5: Convert Each line tuple to each word tuple 
+TOKENIZEsplits the lineinto afieldforeach word.
+FLATTEN will take the collection of records returned by TOKENIZE and produce a 
+separate record for each one, calling the single field in the record word.
+FOREACHoperatoris used togenerate specifieddata transformations based on the 
+column data.
+grunt> words = FOREACH lines GENERATE FLATTEN(TOKENIZE(line)) as word; 
+grunt> dump words;
+(Deer)
+(Bear) 
+(River)
+Big Data Analytics Lab Manual
+4
+(Car)
+(Car) 
+(River) 
+(River) 
+(Car) 
+(River) 
+(Deer) 
+(River) 
+(Bear)
+Step‐6: Group all similar words into each tuple 
+grunt>groupword=GROUPwordsbyword; 
+grunt> dumpgroupword;
+(Car,{(Car),(Car),(Car)})
+(Bear,{(Bear),(Bear)})
+(Deer,{(Deer),(Deer)}) 
+(River,{(River),(River),(River),(River),(River)})
+Step‐6: Count each grouped word and display
+grunt> wordcount = FOREACH groupword GENERATE group, COUNT(words); 
+grunt> dump wordcount;
+(Car,3)
+(Bear,2)
+(Deer,2)
+(River,5)
